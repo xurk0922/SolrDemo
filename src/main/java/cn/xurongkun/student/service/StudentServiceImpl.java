@@ -1,13 +1,14 @@
 package cn.xurongkun.student.service;
 
 import cn.xurongkun.base.service.BaseService;
-import cn.xurongkun.student.entity.Student;
 import cn.xurongkun.student.index.StudentIndex;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -15,13 +16,13 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocumentList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 
 public class StudentServiceImpl implements BaseService<StudentIndex> {
+    private static Logger logger = LogManager.getLogger(StudentServiceImpl.class.getName());
+
     private SolrClient client = null;
 
     {
@@ -36,6 +37,7 @@ public class StudentServiceImpl implements BaseService<StudentIndex> {
                 this.client = new HttpSolrClient.Builder(url+"/"+core).build();
             }
             catch (ConfigurationException cex) {
+                logger.error(cex.getMessage());
                 cex.printStackTrace();
             }
         }
@@ -49,8 +51,10 @@ public class StudentServiceImpl implements BaseService<StudentIndex> {
             response.getResponse().size();
             this.client.commit();
         } catch (SolrServerException e) {
+            logger.error(e.getMessage());
             e.printStackTrace();
         } catch (IOException e) {
+            logger.error(e.getMessage());
             e.printStackTrace();
         }
     }
@@ -60,12 +64,13 @@ public class StudentServiceImpl implements BaseService<StudentIndex> {
         try {
             this.client.addBean(studentIndex);
 
-
             client.commit();
 
         } catch (IOException e) {
+            logger.error(e.getMessage());
             e.printStackTrace();
         } catch (SolrServerException e) {
+            logger.error(e.getMessage());
             e.printStackTrace();
         }
 
@@ -82,8 +87,10 @@ public class StudentServiceImpl implements BaseService<StudentIndex> {
             SolrDocumentList list = response.getResults();
             return JSON.toJSONString(list);
         } catch (SolrServerException e) {
+            logger.error(e.getMessage());
             e.printStackTrace();
         } catch (IOException e) {
+            logger.error(e.getMessage());
             e.printStackTrace();
         }
 
@@ -95,8 +102,10 @@ public class StudentServiceImpl implements BaseService<StudentIndex> {
         try {
             this.client.deleteById(id.toString());
         } catch (SolrServerException e) {
+            logger.error(e.getMessage());
             e.printStackTrace();
         } catch (IOException e) {
+            logger.error(e.getMessage());
             e.printStackTrace();
         }
     }
@@ -106,8 +115,10 @@ public class StudentServiceImpl implements BaseService<StudentIndex> {
         try {
             this.client.deleteByQuery(statement);
         } catch (SolrServerException e) {
+            logger.error(e.getMessage());
             e.printStackTrace();
         } catch (IOException e) {
+            logger.error(e.getMessage());
             e.printStackTrace();
         }
 
